@@ -14,6 +14,7 @@ namespace Infrastructure
 			{
 				opt.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 			});
+			services.AddTransient<ApplicationDbSeeder>();
 			return services;
 		}
 	}
