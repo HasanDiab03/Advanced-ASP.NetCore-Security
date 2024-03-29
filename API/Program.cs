@@ -4,7 +4,8 @@ using Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddDatabase(builder.Configuration);
-builder.Services.AddIdentitySettings();
+builder.Services.AddIdentitySettings(builder.Configuration);
+builder.Services.AddMyOptions(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
