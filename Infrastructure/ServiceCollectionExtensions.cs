@@ -1,4 +1,6 @@
-﻿using Infrastructure.Context;
+﻿using Application.Services.Identity;
+using Infrastructure.Context;
+using Infrastructure.Services.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,7 @@ namespace Infrastructure
 				opt.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 			});
 			services.AddTransient<ApplicationDbSeeder>();
+			services.AddScoped<ITokenService, TokenService>();
 			return services;
 		}
 	}

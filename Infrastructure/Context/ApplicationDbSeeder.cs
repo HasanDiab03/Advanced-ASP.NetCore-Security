@@ -67,7 +67,8 @@ namespace Infrastructure.Context
 					Email = AppCredentials.Email,
 					IsActive = true,
 					FirstName = "Junior",
-					LastName = "Diab"
+					LastName = "Diab",
+					EmailConfirmed = true
 				};
 				await _userManager.CreateAsync(user, AppCredentials.DefaultPassword);
 				await _userManager.AddToRolesAsync(user, AppRoles.DefaultRoles);
