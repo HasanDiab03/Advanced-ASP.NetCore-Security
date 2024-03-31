@@ -23,7 +23,8 @@ namespace Infrastructure.Context
 		{
 			await CheckAndApplyMigrationsAsync();
 			await SeedRolesAsync();
-			await SeedUserAsync();
+			await SeedAdminUserAsync();
+			await SeedBasicUserAsync();
 		}
 		private async Task CheckAndApplyMigrationsAsync()
 		{
@@ -56,7 +57,7 @@ namespace Infrastructure.Context
 				}
 			}
 		}
-		private async Task SeedUserAsync()
+		private async Task SeedAdminUserAsync()
 		{
 			var userExists = await _userManager.FindByEmailAsync(AppCredentials.Email);
 			if(userExists is null)
@@ -92,6 +93,24 @@ namespace Infrastructure.Context
 					});
 					await _context.SaveChangesAsync();
 				}
+			}
+		}
+		public async Task SeedBasicUserAsync()
+		{
+			var userExists = await _userManager.FindByEmailAsync("hasan@gmail.com");
+			if(userExists is null) 
+			{
+				var user = new ApplicationUser
+				{
+					UserName = "Hasan",
+					Email = "hasan@gmail.com",
+					IsActive = true,
+					FirstName = "Hasan",
+					LastName = "Diab",
+					EmailConfirmed = true,
+				};
+				await _userManager.CreateAsync(user, "12345H");
+				await _userManager.AddToRoleAsync(user, AppRoles.Basic);
 			}
 		}
     }

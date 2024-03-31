@@ -1,9 +1,12 @@
 ﻿using API.Permissions;
 using Application.AppConfigs;
+using Application.Features.Identity.Queries;
+using Application.Services.Employees;
 using Common.Authorization;
 using Common.Responses.Wrappers;
 using Infrastructure.Context;
 using Infrastructure.Models;
+using Infrastructure.Services.Employees;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -98,7 +101,7 @@ namespace API
 					OnForbidden = ctx =>
 					{
 						ctx.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-						ctx.Response.ContentType = "application/json";
+						ctx.Response.ContentType = "application/json";	
 						var result = JsonSerializer.Serialize(ResponseWrapper<object>.Fail("You are not Authorized to access this resource"));
 						return ctx.Response.WriteAsync(result);
 					}
@@ -153,6 +156,13 @@ namespace API
 			});
 			return services;
 
+		}
+		public static IServiceCollection AddAppServices(this IServiceCollection services)
+		{
+			services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(GetTokenQueryHandler))))
+			.AddAutoMapper(new[] { typeof(GetRefreshTokenQuery).Assembly, typeof(EmployeeRepository).Assembly });
+			services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+			return services;
 		}
 	}
 }
