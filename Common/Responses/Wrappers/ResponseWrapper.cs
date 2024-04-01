@@ -1,6 +1,11 @@
 ﻿namespace Common.Responses.Wrappers
 {
-	public class ResponseWrapper<T>
+	public interface IResponseWrapper
+	{
+		public bool IsSuccessful { get; set; }
+		public string Error { get; set; }
+	}
+	public class ResponseWrapper<T> : IResponseWrapper
 	{
 		public bool IsSuccessful { get; set; }
 		public T ResponseData { get; set; }

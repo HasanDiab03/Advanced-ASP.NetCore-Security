@@ -1,10 +1,18 @@
 using API;
 using Infrastructure;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+	var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+	options.Filters.Add(new AuthorizeFilter(policy)); 
+});
 builder.Services.AddDatabase(builder.Configuration);
-builder.Services.AddIdentitySettings();
+builder.Services.AddIdentitySettings()
+	.AddIdentityServices();
 builder.Services.AddJwtAuth(builder.Services.AddMyOptions(builder.Configuration));
 builder.Services.AddAppServices();
 builder.Services.AddJWTSwagger();

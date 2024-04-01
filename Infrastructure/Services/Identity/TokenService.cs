@@ -1,7 +1,7 @@
 ﻿using Application.AppConfigs;
 using Application.Services.Identity;
-using Common.Requests;
-using Common.Responses;
+using Common.Requests.Identity;
+using Common.Responses.Identity;
 using Common.Responses.Wrappers;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +14,7 @@ using System.Text;
 
 namespace Infrastructure.Services.Identity
 {
-	public class TokenService : ITokenService
+    public class TokenService : ITokenService
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly RoleManager<ApplicationRole> _roleManager;

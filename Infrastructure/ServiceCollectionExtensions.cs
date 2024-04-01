@@ -17,7 +17,12 @@ namespace Infrastructure
 				opt.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 			});
 			services.AddTransient<ApplicationDbSeeder>();
-			services.AddScoped<ITokenService, TokenService>();
+			return services;
+		}
+		public static IServiceCollection AddIdentityServices(this IServiceCollection services)
+		{
+			services.AddScoped<ITokenService, TokenService>()
+				.AddScoped<IUserRepository, UserRepository>();
 			return services;
 		}
 	}

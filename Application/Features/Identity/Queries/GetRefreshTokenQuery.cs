@@ -1,6 +1,6 @@
 ﻿using Application.Services.Identity;
-using Common.Requests;
-using Common.Responses;
+using Common.Requests.Identity;
+using Common.Responses.Identity;
 using Common.Responses.Wrappers;
 using MediatR;
 using System;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Identity.Queries
 {
-	public record GetRefreshTokenQuery(RefreshTokenRequest Request) : IRequest<ResponseWrapper<TokenResponse>>;
+    public record GetRefreshTokenQuery(RefreshTokenRequest Request) : IRequest<ResponseWrapper<TokenResponse>>;
 	public class GetRefreshTokenQueryHandler : IRequestHandler<GetRefreshTokenQuery, ResponseWrapper<TokenResponse>>
 	{
 		private readonly ITokenService _tokenService;
