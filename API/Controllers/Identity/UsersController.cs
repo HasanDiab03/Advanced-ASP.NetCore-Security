@@ -6,6 +6,7 @@ using Common.Requests.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 
 namespace API.Controllers.Identity
 {
@@ -13,7 +14,7 @@ namespace API.Controllers.Identity
 	public class UsersController : BaseController<UsersController>
 	{
 		[HttpPost]
-		[MustHavePermission(AppFeatures.Users, AppActions.Create)]
+		[AllowAnonymous]
 		public async Task<IActionResult> RegisterUser([FromBody] RegisterRequest command)
 		{
 			var result = await Mediator.Send(new RegisterUserCommand(command));
@@ -41,7 +42,7 @@ namespace API.Controllers.Identity
 			return HandleResult(result);
 		}
 		[HttpPut("change-password/{id}")]
-		[MustHavePermission(AppFeatures.Users, AppActions.Update)]
+		[AllowAnonymous]
 		public async Task<IActionResult> ChangePassword([FromRoute] string id, [FromBody] ChangePasswordRequest request)
 		{
 			var result = await Mediator.Send(new ChangePasswordCommand(id, request));
@@ -51,5 +52,13 @@ namespace API.Controllers.Identity
 		[MustHavePermission(AppFeatures.Users, AppActions.Update)]
 		public async Task<IActionResult> ChangeStatus([FromRoute] string id)
 			=> HandleResult(await Mediator.Send(new ChangeUserStatusCommand(id)));
+		[HttpGet("roles/{id}")]
+		[MustHavePermission(AppFeatures.Roles, AppActions.Read)]
+		public async Task<IActionResult> GetRoles([FromRoute] string id)
+			=> HandleResult(await Mediator.Send(new GetRolesQuery(id)));
+		[HttpPut("update-roles/{id}")]
+		[MustHavePermission(AppFeatures.Users, AppActions.Update)]
+		public async Task<IActionResult> UpdateUserRoles([FromRoute] string id, [FromBody] UpdateUserRolesRequest request)
+			=> HandleResult(await Mediator.Send(new UpateUserRolesCommand(id, request)));
 	}
 }

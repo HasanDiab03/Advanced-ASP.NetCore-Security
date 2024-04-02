@@ -17,13 +17,15 @@ namespace Infrastructure.Services.Identity
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly RoleManager<ApplicationRole> _roleManager;
 		private readonly IMapper _mapper;
+		private readonly ICurrentUserRepository _currentUserRepository;
 
 		public UserRepository(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
-			IMapper mapper)
+			IMapper mapper, ICurrentUserRepository currentUserRepository)
         {
 			_userManager = userManager;
 			_roleManager = roleManager;
 			_mapper = mapper;
+			_currentUserRepository = currentUserRepository;
 		}
 
 		public async Task<IResponseWrapper> ChangePassword(string id, ChangePasswordRequest request)
@@ -37,7 +39,7 @@ namespace Infrastructure.Services.Identity
 				.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
 			if(!identityResult.Succeeded)
 			{
-				return ResponseWrapper<string>.Fail("Failed To update password");
+				return ResponseWrapper<string>.Fail(GetIdentityResultErrorDescription(identityResult));
 			}
 			return ResponseWrapper<string>.Success("Password has been updated!");
 		}
@@ -53,7 +55,7 @@ namespace Infrastructure.Services.Identity
 			var identityResult = await _userManager.UpdateAsync(user);
 			if(!identityResult.Succeeded)
 			{
-				return ResponseWrapper<string>.Fail("Failed to update status");
+				return ResponseWrapper<string>.Fail(GetIdentityResultErrorDescription(identityResult));
 			}
 			return ResponseWrapper<string>.Success($"Status Has been updated, user is now: {(user.IsActive ? "Active" : "InActive")}");
 		}
@@ -67,6 +69,25 @@ namespace Infrastructure.Services.Identity
 			}
 			var mappedUsers = _mapper.Map<List<UserResponse>>(users);
 			return ResponseWrapper<List<UserResponse>>.Success(mappedUsers);
+		}
+
+		public async Task<IResponseWrapper> GetRoles(string id)
+		{
+			var user = await _userManager.FindByIdAsync(id);
+			if(user is null)
+			{
+				return ResponseWrapper<string>.Fail("User does not exist");
+			}
+			var allRoles = await _roleManager.Roles.ToListAsync();
+			var userRoles = await _userManager.GetRolesAsync(user);
+			var userRolesVM = allRoles.Select(role => new UserRoleViewModel
+			{
+				RoleName = role.Name,
+				RoleDescription = role.Description,
+				IsAssignedToUser = userRoles.Contains(role.Name)
+			}).ToList();
+			
+			return ResponseWrapper<List<UserRoleViewModel>>.Success(userRolesVM);
 		}
 
 		public async Task<IResponseWrapper> GetUserById(string id)
@@ -111,7 +132,7 @@ namespace Infrastructure.Services.Identity
 				await _userManager.AddToRoleAsync(user, AppRoles.Basic);
 				return ResponseWrapper<string>.Success("User Registered Successfully");
 			}
-			return ResponseWrapper<string>.Fail("User Registration Failed");
+			return ResponseWrapper<string>.Fail(GetIdentityResultErrorDescription(identityResult));
 		}
 
 		public async Task<IResponseWrapper> UpdateUser(string id, UpdateUserRequest request)
@@ -125,10 +146,52 @@ namespace Infrastructure.Services.Identity
 			var identityResult = await _userManager.UpdateAsync(user);
 			if(!identityResult.Succeeded)
 			{
-				return ResponseWrapper<string>.Fail("Failed to update user");
+				return ResponseWrapper<string>.Fail(GetIdentityResultErrorDescription(identityResult));
 			}
 			var updateUserMap = _mapper.Map<UserResponse>(user);
 			return ResponseWrapper<UserResponse>.Success(updateUserMap);
+		}
+
+		public async Task<IResponseWrapper> UpdateUserRoles(string id, UpdateUserRolesRequest request)
+		{
+			var user = await _userManager.FindByIdAsync(id);
+			if(user is null)
+			{
+				return ResponseWrapper<string>.Fail("User not found");
+			}
+			if(user.Email == AppCredentials.Email)
+			{
+				return ResponseWrapper<string>.Fail("User Roles Update Not Permitted");
+			}
+			var roles = await _userManager.GetRolesAsync(user);
+			var assignedRoles = request.Roles.Where(x => x.IsAssignedToUser).ToList();
+			var currentLoggedInUser = await _userManager.FindByIdAsync(_currentUserRepository.Id);
+			if(currentLoggedInUser is null)
+			{
+				return ResponseWrapper<string>.Fail("User does not exist");
+			} 
+			if(!(await _userManager.IsInRoleAsync(currentLoggedInUser, AppRoles.Admin)))
+			{
+				return ResponseWrapper<string>.Fail("User Roles Update Not Permitted");
+			}
+			// approach => remove roles that have IsAssignedToUser = false, add ones that have it true
+			var identityResult = await _userManager.RemoveFromRolesAsync(user, roles);
+			if(!identityResult.Succeeded)
+			{
+				return ResponseWrapper<string>.Fail(GetIdentityResultErrorDescription(identityResult));
+			}
+			identityResult = await _userManager.AddToRolesAsync(user, assignedRoles.Select(x => x.RoleName));
+			if(!identityResult.Succeeded)
+			{
+				return ResponseWrapper<string>.Fail(GetIdentityResultErrorDescription(identityResult));
+			}
+			return ResponseWrapper<string>.Success("User Roles Update Successfully");
+				
+		}
+
+		private List<string> GetIdentityResultErrorDescription(IdentityResult identityResult)
+		{
+			return identityResult.Errors.Select(x => x.Description).ToList();
 		}
 	}
 }

@@ -2,11 +2,13 @@
 using Application.AppConfigs;
 using Application.Features.Identity.Queries;
 using Application.Services.Employees;
+using Application.Services.Identity;
 using Common.Authorization;
 using Common.Responses.Wrappers;
 using Infrastructure.Context;
 using Infrastructure.Models;
 using Infrastructure.Services.Employees;
+using Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -161,7 +163,9 @@ namespace API
 		{
 			services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(GetTokenQueryHandler))))
 			.AddAutoMapper(new[] { typeof(GetRefreshTokenQuery).Assembly, typeof(EmployeeRepository).Assembly });
-			services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+			services.AddScoped<IEmployeeRepository, EmployeeRepository>()
+					.AddScoped<ICurrentUserRepository, CurrentUserRepository>()
+					.AddHttpContextAccessor();
 			return services;
 		}
 	}

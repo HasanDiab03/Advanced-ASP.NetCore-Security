@@ -11,5 +11,7 @@ namespace Application.Services.Identity
 		Task<IResponseWrapper> UpdateUser(string id, UpdateUserRequest request);
 		Task<IResponseWrapper> ChangePassword(string id, ChangePasswordRequest request);
 		Task<IResponseWrapper> ChangeUserStatus(string id);
+		Task<IResponseWrapper> GetRoles(string id);
+		Task<IResponseWrapper> UpdateUserRoles(string id, UpdateUserRolesRequest request);
 	}
 }
