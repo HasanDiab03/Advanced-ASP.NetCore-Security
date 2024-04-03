@@ -39,5 +39,7 @@ namespace Common.Authorization
 			= new ReadOnlyCollection<AppPermission>(_all.Where(p => !p.IsBasic).ToArray());
 		public static IReadOnlyList<AppPermission> BasicPermissions { get; }
 			= new ReadOnlyCollection<AppPermission>(_all.Where(p => p.IsBasic).ToArray());
+		public static IReadOnlyList<AppPermission> AllPermission { get; } =
+			new ReadOnlyCollection<AppPermission>(_all);
 	}
 }

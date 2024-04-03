@@ -165,6 +165,7 @@ namespace API
 			.AddAutoMapper(new[] { typeof(GetRefreshTokenQuery).Assembly, typeof(EmployeeRepository).Assembly });
 			services.AddScoped<IEmployeeRepository, EmployeeRepository>()
 					.AddScoped<ICurrentUserRepository, CurrentUserRepository>()
+					.AddScoped<IRoleRepository, RoleRepository>()
 					.AddHttpContextAccessor();
 			return services;
 		}
