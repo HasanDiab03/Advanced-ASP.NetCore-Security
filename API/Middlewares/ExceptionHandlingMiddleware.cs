@@ -1,5 +1,7 @@
 ﻿using Application.Exceptions;
+using Azure;
 using Common;
+using Common.Responses.Wrappers;
 using System.Net;
 using System.Text.Json;
 
@@ -24,20 +26,19 @@ namespace API.Middlewares
 			{
 				var response = context.Response;
 				response.ContentType = "application/json";
-				Error err = new Error();
+				IResponseWrapper responseWrapper;
 				switch (ex)
 				{
 					case CustomValidationException cvex:
 						response.StatusCode = (int)HttpStatusCode.BadRequest;
-						err.ErrorMessages = cvex.ErrorMessages;
-						err.FriendlyMessage = cvex.FriendlyErrorMessage;
+						responseWrapper = ResponseWrapper<string>.Fail(cvex.ErrorMessages);
 						break;
 					default:
 						response.StatusCode = (int)HttpStatusCode.InternalServerError;
-						err.FriendlyMessage = ex.Message;
+						responseWrapper = ResponseWrapper<string>.Fail(ex.Message);
 						break;
 				}
-				await response.WriteAsync(JsonSerializer.Serialize(err));
+				await response.WriteAsync(JsonSerializer.Serialize(responseWrapper));
 			}
 		}
 	}

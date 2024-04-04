@@ -161,8 +161,7 @@ namespace API
 		}
 		public static IServiceCollection AddAppServices(this IServiceCollection services)
 		{
-			services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(GetTokenQueryHandler))))
-			.AddAutoMapper(new[] { typeof(GetRefreshTokenQuery).Assembly, typeof(EmployeeRepository).Assembly });
+			services.AddAutoMapper(new[] { typeof(GetRefreshTokenQuery).Assembly, typeof(EmployeeRepository).Assembly });
 			services.AddScoped<IEmployeeRepository, EmployeeRepository>()
 					.AddScoped<ICurrentUserRepository, CurrentUserRepository>()
 					.AddScoped<IRoleRepository, RoleRepository>()

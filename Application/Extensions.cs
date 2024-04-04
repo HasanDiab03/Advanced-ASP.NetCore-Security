@@ -1,6 +1,4 @@
-﻿using Application.Features.Employees.Commands;
-using Application.Features.Employees.Validators;
-using Application.Pipelines;
+﻿using Application.Pipelines;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,8 +10,10 @@ namespace Application
 	{
 		public static IServiceCollection AddApplicationLayerServices(this IServiceCollection services)
 		{
-			return services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>))
-				.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+			return services
+				.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
+				.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
+				.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>));
 		}
 	}
 }

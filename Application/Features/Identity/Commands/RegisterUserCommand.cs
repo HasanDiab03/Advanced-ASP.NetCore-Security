@@ -1,11 +1,13 @@
-﻿using Application.Services.Identity;
+﻿using Application.Pipelines;
+using Application.Services.Identity;
 using Common.Requests.Identity;
 using Common.Responses.Wrappers;
 using MediatR;
 
 namespace Application.Features.Identity.Commands
 {
-	public record RegisterUserCommand(RegisterRequest Request) : IRequest<IResponseWrapper>;
+	public record RegisterUserCommand(RegisterRequest Request) : 
+		IRequest<IResponseWrapper>, IValidateMe;
 	public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, IResponseWrapper>
 	{
 		private readonly IUserRepository _userRepository;
