@@ -1,4 +1,5 @@
-﻿using Application.Services.Employees;
+﻿using Application.Pipelines;
+using Application.Services.Employees;
 using AutoMapper;
 using Common.Requests;
 using Common.Responses.Wrappers;
@@ -7,7 +8,7 @@ using MediatR;
 
 namespace Application.Features.Employees.Commands
 {
-	public record UpdateEmployeeCommand(int Id, UpdateEmployeeRequest Command) : IRequest<ResponseWrapper<Employee>>;
+	public record UpdateEmployeeCommand(int Id, UpdateEmployeeRequest Command) : IRequest<ResponseWrapper<Employee>>, IValidateMe;
 	public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeCommand, ResponseWrapper<Employee>>
 	{
 		private readonly IEmployeeRepository _employeeRepository;

@@ -50,7 +50,6 @@ namespace API.Controllers
 			return Ok(result);
 		}
 		[HttpGet]
-		[MustHavePermission(AppFeatures.Employees, AppActions.Read)]
 		public async Task<IActionResult> GetEmployees()
 		{
 			var result = await Mediator.Send(new GetEmployeesQuery());

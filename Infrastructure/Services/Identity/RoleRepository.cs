@@ -138,8 +138,8 @@ namespace Infrastructure.Services.Identity
 			var role = await _roleManager.FindByIdAsync(id);
 			if (role is null)
 				return ResponseWrapper<string>.Fail("Role does not exist");
-			if (role.Name == AppRoles.Admin)
-				return ResponseWrapper<string>.Fail("Cannot update permissions for this role");
+			//if (role.Name == AppRoles.Admin)
+				//return ResponseWrapper<string>.Fail("Cannot update permissions for this role");
 			var permissionsToBeAssigned = request.RoleClaims.Where(x => x.IsAssignedToRole).ToList();
 			var claimsToRemove = await _roleManager.GetClaimsAsync(role);
 			foreach (var claim in claimsToRemove)
